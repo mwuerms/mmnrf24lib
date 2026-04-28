@@ -14,7 +14,7 @@
 #include "cmsis_os.h"
 #include <string.h>
 #include "usart.h"
-#include "str_buf.h"
+#include "../mmlib/str_buf.h"
 
 // - private variables for freeRTOS tasks --------------------------------------
 

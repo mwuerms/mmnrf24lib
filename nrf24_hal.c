@@ -56,10 +56,10 @@ void nrf24_hal_Close(void) {
 
 void nrf24_hal_irq_ie_en(void) {
 	nrf24_hal_irq_ie_dis();
-	NVIC_SetPriority(nRF_IRQ_EXTI, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),8, 0));
+	NVIC_SetPriority(nRF_IRQ_EXTI_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),8, 0));
 	nrf24_hal_irq_edge_falling();
 	nrf24_hal_irq_ifg_clr();
-	HAL_NVIC_EnableIRQ(nRF_IRQ_EXTI);
+	HAL_NVIC_EnableIRQ(nRF_IRQ_EXTI_IRQn);
 	if(nrf24_hal_irq_get() == 0) {
 		// irq is already low: set ifg
 		nrf24_hal_irq_ifg_set();

@@ -25,12 +25,15 @@
 #define nrf24_hal_cs_clr()		LL_GPIO_ResetOutputPin(nRF_CS_GPIO_Port, nRF_CS_Pin)
 
 // IRQ: nRF_IRQ_GPIO_Port, nRF_IRQ_Pin, EXTI2_IRQn
+#ifndef nRF_IRQ_EXTI_IRQn
+#error define nRF_IRQ_EXTI_IRQn in main.h resp. in project.ioc
+#endif
 #define nrf24_hal_irq_in()				// already set
 #define nrf24_hal_irq_get() 			LL_GPIO_IsInputPinSet(nRF_IRQ_GPIO_Port, nRF_IRQ_Pin)
-#define nrf24_hal_irq_ie_dis() 			HAL_NVIC_DisableIRQ(nRF_IRQ_EXTI)
-#define nrf24_hal_irq_edge_falling()	LL_EXTI_EnableFallingTrig_0_31(nRF_IRQ_EXTI)
-#define nrf24_hal_irq_ifg_set() 		LL_EXTI_GenerateSWI_0_31(nRF_IRQ_EXTI)
-#define nrf24_hal_irq_ifg_clr() 		LL_EXTI_ClearFlag_0_31(nRF_IRQ_EXTI)
+#define nrf24_hal_irq_ie_dis() 			HAL_NVIC_DisableIRQ(nRF_IRQ_EXTI_IRQn)
+#define nrf24_hal_irq_edge_falling()	LL_EXTI_EnableFallingTrig_0_31(nRF_IRQ_EXTI_IRQn)
+#define nrf24_hal_irq_ifg_set() 		LL_EXTI_GenerateSWI_0_31(nRF_IRQ_EXTI_IRQn)
+#define nrf24_hal_irq_ifg_clr() 		LL_EXTI_ClearFlag_0_31(nRF_IRQ_EXTI_IRQn)
 
 // - public functions ----------------------------------------------------------
 void nrf24_hal_Init(void);

@@ -30,7 +30,7 @@
 #ifndef _NRF24L01_H
 #define _NRF24L01_H
 
-#include "utils.h"
+#include "../mmlib/mmutils.h"
 
 /* Register Map */
 #define RF24_CONFIG      0x00
@@ -126,4 +126,3 @@
 #define RF24_RX_P_NO_MASK   0x0E
 
 #endif
-
