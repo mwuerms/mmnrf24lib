@@ -16,25 +16,33 @@
 #define nRF24_MSG_SIZE (32)
 #define nRF24_MSG_DATA_SIZE (nRF24_MSG_SIZE-2)
 
-typedef struct {
+typedef struct  __attribute__((packed)) {
 	int16_t acc_x, acc_y, acc_z;
 	int16_t temp;
 	int16_t gyro_x, gyro_y, gyro_z;
 } mpu9250_values_t;
 
-typedef struct {
+typedef struct  __attribute__((packed)) {
 	float angle;
 	int16_t acc_x, acc_y;
 	int16_t gyro_z;
 } angle_values_t;
 
 typedef struct  __attribute__((packed)) {
+	struct {
+		int8_t x, y;
+	} joystick[2];
+	uint8_t buttons[2];
+} remote_ctrl01_t;
+
+typedef struct  __attribute__((packed)) {
 	uint8_t id;
 	uint8_t len;
 	union {
-		uint8_t u8[nRF24_MSG_SIZE];
+		uint8_t u8[nRF24_MSG_DATA_SIZE];
 		mpu9250_values_t mpu9250_values;
 		angle_values_t angle_values;
+		remote_ctrl01_t remote_ctrl01;
 	} data;
 } nrf24_msg_t;
 
@@ -42,6 +50,9 @@ typedef struct  __attribute__((packed)) {
 #define nRF24_MSG_ID_ANGLE_VALUES (0xA2)
 //#define nRF24_MSG_ID_GYRO_VALUES (0xA2)
 //#define nRF24_MSG_ID_xx_VALUES (0xA)
+
+#define nRF24_MSG_ID_REMOTE_CTRL00 (0xC0)
+#define nRF24_MSG_ID_REMOTE_CTRL01 (0xC1)
 
 #define nRF24_MSG_ID_STRING (0xD0)
 

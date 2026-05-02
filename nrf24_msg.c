@@ -86,7 +86,7 @@ void nrf24_msg_send_mpu9250_values(int16_t acc_x, int16_t acc_y, int16_t acc_z, 
 	values->gyro_x = gyro_x;
 	values->gyro_y = gyro_y;
 	values->gyro_z = gyro_z;
-	m.len = (7*sizeof(int16_t));
+	m.len = sizeof(mpu9250_values_t);
 
 	nrf24_send_message(&m);
 }
@@ -100,12 +100,23 @@ void nrf24_msg_send_angle_values(float angle, int16_t acc_x, int16_t acc_y, int1
 	values->acc_x  = acc_x;
 	values->acc_y  = acc_y;
 	values->gyro_z = gyro_z;
-	m.len = (1*sizeof(float)) + (3*sizeof(int16_t));
+	m.len = sizeof(angle_values_t);
 
 	nrf24_send_message(&m);
 }
 
+void nrf24_msg_send_remote_ctrl01(int8_t x0, int8_t y0, uint8_t btn0) {
+	nrf24_msg_t m;
+	m.id = nRF24_MSG_ID_REMOTE_CTRL01;
+	remote_ctrl01_t *remote_ctrl01 = (remote_ctrl01_t *)(&m.data.u8);
 
+	remote_ctrl01->joystick[0].x = x0;
+	remote_ctrl01->joystick[0].y = y0;
+	remote_ctrl01->buttons[0] = btn0;
+	m.len = sizeof(remote_ctrl01_t);
+
+	nrf24_send_message(&m);
+}
 
 
 
@@ -116,8 +127,8 @@ void nrf24_receive_packet(nrf24_msg_t *m) {
 
 static void nrf24_msg_in_task_cb(void *argument) {
 	nrf24_msg_t m;
-	mpu9250_values_t *mpu9250_values;
-	angle_values_t *angle_values;
+	//mpu9250_values_t *mpu9250_values;
+	//angle_values_t *angle_values;
 	uint16_t str_len;
 	uint8_t new_line;
 
@@ -125,9 +136,9 @@ static void nrf24_msg_in_task_cb(void *argument) {
 		if(osMessageQueueGet(nrf24_msg_in_queue_handle, &m, 0, osWaitForever) == osOK) {
 			switch(m.id) {
 			// -----------------------------------------------------------------
-			case nRF24_MSG_ID_MPU9250_VALUES:
+			case nRF24_MSG_ID_MPU9250_VALUES: {
 				//m.len is unimportant
-				mpu9250_values = (mpu9250_values_t *)(&m.data.u8);
+				mpu9250_values_t *mpu9250_values = (mpu9250_values_t *)(&m.data.u8);
 
 				str_len = str_buf_clear(nrf24_out_str, NRF24_OUT_STR_SIZE);
 				str_len = str_buf_append_int16(nrf24_out_str, NRF24_OUT_STR_SIZE, mpu9250_values->acc_x);
@@ -146,12 +157,13 @@ static void nrf24_msg_in_task_cb(void *argument) {
 				str_len = str_buf_append_char(nrf24_out_str, NRF24_OUT_STR_SIZE, '\n');
 
 				uart_send_buffer((uint8_t *)nrf24_out_str, str_len);
+				}
 				break;
 
 			// -----------------------------------------------------------------
-			case nRF24_MSG_ID_ANGLE_VALUES:
+			case nRF24_MSG_ID_ANGLE_VALUES: {
 				//m.len is unimportant
-				angle_values = (angle_values_t *)(&m.data.u8);
+				angle_values_t *angle_values = (angle_values_t *)(&m.data.u8);
 				float temp_float = angle_values->angle;
 
 				str_len = str_buf_clear(nrf24_out_str, NRF24_OUT_STR_SIZE);
@@ -165,6 +177,25 @@ static void nrf24_msg_in_task_cb(void *argument) {
 				str_len = str_buf_append_char(nrf24_out_str, NRF24_OUT_STR_SIZE, '\n');
 
 				uart_send_buffer((uint8_t *)nrf24_out_str, str_len);
+				}
+				break;
+
+			// -----------------------------------------------------------------
+			case nRF24_MSG_ID_REMOTE_CTRL01: {
+				//m.len is unimportant
+				remote_ctrl01_t *remote_ctrl01 = (remote_ctrl01_t *)(&m.data.u8);
+
+				str_len = str_buf_clear(nrf24_out_str, NRF24_OUT_STR_SIZE);
+				str_len = str_buf_append_string(nrf24_out_str, NRF24_OUT_STR_SIZE, "REMOTE_CTRL01: ");
+				str_len = str_buf_append_int8(nrf24_out_str, NRF24_OUT_STR_SIZE, remote_ctrl01->joystick[0].x);
+				str_len = str_buf_append_char(nrf24_out_str, NRF24_OUT_STR_SIZE, ',');
+				str_len = str_buf_append_int8(nrf24_out_str, NRF24_OUT_STR_SIZE, remote_ctrl01->joystick[0].y);
+				str_len = str_buf_append_char(nrf24_out_str, NRF24_OUT_STR_SIZE, ',');
+				str_len = str_buf_append_uint8(nrf24_out_str, NRF24_OUT_STR_SIZE, remote_ctrl01->buttons[0]);
+				str_len = str_buf_append_char(nrf24_out_str, NRF24_OUT_STR_SIZE, '\n');
+
+				uart_send_buffer((uint8_t *)nrf24_out_str, str_len);
+				}
 				break;
 
 			// -----------------------------------------------------------------
