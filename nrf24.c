@@ -82,7 +82,7 @@ static inline void nrf24_send_event(uint16_t ev) {
 }
 
 static inline void nrf24_clear_all_events(void) {
-	uint16_t ev;
+	//uint16_t ev;
 	// read all events from queue until it is empty
 	//while(osMessageQueueGet(nrf24_event_queue_handle, &ev, 0, osWaitForever) == osOK);
 	osEventFlagsClear(nrf24_event_handle, 0xFFFFFFFF);
@@ -116,7 +116,7 @@ static struct {
 
 // - public functions ----------------------------------------------------------
 
-void nrf24_init(uint8_t role) {
+void nrf24_init(uint8_t role, nrf24_msg_in_parse_t msg_in_func) {
 	nrf24_ctrl.state = nRF24_STATE_CLOSED;
 
 	nrf24_ctrl.setup.rxtx_addr[0] = 0x00;
@@ -142,7 +142,7 @@ void nrf24_init(uint8_t role) {
 
 	nrf24_cmd_Init();
 	nrf24_hal_Init();
-	nrf24_msg_init();
+	nrf24_msg_init(msg_in_func);
 
 	if(nrf24_timer_handle  == NULL) {
 		nrf24_timer_handle = osTimerNew(nrf24_timer_cb, osTimerOnce, NULL, &nrf24_timer_attributes);

@@ -27,7 +27,7 @@ typedef struct {
 #define nRF24_ROLE_CENTRAL (1) // controller, always receiving, can send data to client after receiving
 #define nRF24_ROLE_PERIPHERIAL (2) // client, wants to send some data, will only receive after sending
 #define nRF24_ROLE_TESTING (3) // client, wants to send some data, will only receive after sending
-void nrf24_init(uint8_t role);
+void nrf24_init(uint8_t role, nrf24_msg_in_parse_t msg_in_func);
 void nrf24_open(void);
 void nrf24_close(void);
 void nrf24_process_irq(void);

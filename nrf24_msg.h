@@ -51,17 +51,18 @@ typedef struct  __attribute__((packed)) {
 //#define nRF24_MSG_ID_GYRO_VALUES (0xA2)
 //#define nRF24_MSG_ID_xx_VALUES (0xA)
 
-#define nRF24_MSG_ID_REMOTE_CTRL00 (0xC0)
-#define nRF24_MSG_ID_REMOTE_CTRL01 (0xC1)
+#define nRF24_MSG_ID_REQUEST_REMOTE_CTRL01 (0xC1)
+#define nRF24_MSG_ID_ANSWER_REMOTE_CTRL01 (0xC2)
 
 #define nRF24_MSG_ID_STRING (0xD0)
 
+typedef void (* nrf24_msg_in_parse_t)(nrf24_msg_t *msg);
 
 // - public variables ----------------------------------------------------------
 
 // - public functions ----------------------------------------------------------
 
-void nrf24_msg_init(void);
+void nrf24_msg_init(nrf24_msg_in_parse_t msg_in_func);
 void nrf24_msg_send_string(char *str);
 void nrf24_msg_send_mpu9250_values(int16_t acc_x, int16_t acc_y, int16_t acc_z, int16_t temp, int16_t gyro_x, int16_t gyro_y, int16_t gyro_z);
 void nrf24_msg_send_angle_values(float angle, int16_t acc_x, int16_t acc_y, int16_t gyro_z);
